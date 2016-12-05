@@ -1,0 +1,18 @@
+```php
+<?php
+require 'authentication';
+
+// Popular Events
+// Endpoint: /api/v2/sports/popular/<sportId>
+
+$popularEvents = new \Sportsbook\EventList();
+$sportId = 5;
+
+try {
+	$popularEvents->parseFromString(getApiResponse('popular/' . $sportId));
+} catch (Exception $e) {
+	die('Unable to get popular events: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Popular events: ' . count($popularEvents->getEvents()) . ' events for sport #' . $sportId . PHP_EOL;
+```

@@ -1,0 +1,25 @@
+```php
+<?php
+require 'authentication';
+
+// Live Events
+// Endpoint: /api/v2/sports/live_events
+
+$liveEvents = new \Sportsbook\EventList();
+
+try {
+	$liveEvents->parseFromString(getApiResponse('live_events'));
+} catch (Exception $e) {
+	die('Unable to get live events: ' . $e->getMessage() . PHP_EOL);
+}
+
+$eventIds = array_values(array_map(function (\Sportsbook\Event $event) {
+	return $event->getId();
+}, $liveEvents->getEvents()));
+
+$sportIds = array_values(array_unique(array_map(function (\Sportsbook\Event $event) {
+	return $event->getSport()->getId();
+}, $liveEvents->getEvents())));
+
+echo 'Live events: ' . count($eventIds) . ' events in ' . count($sportIds) . ' sports' . PHP_EOL;
+```

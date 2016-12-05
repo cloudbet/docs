@@ -1,0 +1,19 @@
+```php
+<?php
+require 'authentication';
+
+// Event
+// Endpoint: /api/v2/sports/event/<eventId>
+
+$event = new \Sportsbook\Event();
+
+try {
+	$event->parseFromString(getApiResponse('event/' . $eventIds[array_rand($eventIds)]));
+} catch (Exception $e) {
+	die('Unable to get event: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Event #' . $event->getId() . ': ' . implode(' vs ', array_map(function (\Sportsbook\Competitor $competitor) {
+	return $competitor->getName();
+}, $event->getCompetitors())) . PHP_EOL;
+```

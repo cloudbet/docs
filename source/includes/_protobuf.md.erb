@@ -1,0 +1,58 @@
+# Data Schema (Protobuf)
+We use [Google Protocol Buffers](https://developers.google.com/protocolbuffers) or Protobuf to define our data schema. Protobuf provides bindings to generate classes in most programming languages. This is the preferred method for accessing our APIs since once you use Protobuf you can benefit from the performance benefits of Protobuf. You can request JSON instead but you'll lose the benefits of using binary.
+## Installing Protobuf
+### Debian/Ubuntu
+<aside>
+apt-get install protobuf-compiler
+</aside>
+
+###MacOS:
+<aside>
+brew install protobuf
+</aside>
+
+### Generate Source Example
+<aside>
+protoc --go_out=. feed.proto
+</aside>
+
+## Language specific bindings
+<%= partial 'includes/php/protobuf' %>
+####Ruby:
+<aside>
+gem install protobuf
+</aside>
+
+####Go:
+<aside>
+go get github.com/golang/protobuf/proto<br/>
+go get github.com/golang/protobuf/protoc-gen-go
+</aside>
+
+####Python:
+<aside>
+export PYTHONPATH=~/python<br/>
+easy_install -d ~/python protobuf
+</aside>
+
+####PHP:
+Install [protobuf](https://github.com/allegro/php-protobuf) PHP extension as described in the project README
+
+## Usage
+### Examples
+
+#### PHP
+
+1. Run `./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php` to compile messages from a proto file.
+2. Run `php example.php` to decode random API responses. The output produced should be similar to following:
+
+### Application Setup Example
+
+<aside>
+mkdir protobuf
+echo '*\n!.gitignore\n!schema' > protobuf/.gitignore
+git submodule add git@github.com:cloudbet/api-schema.git protobuf/schema
+</aside>
+
+Check one of the sample scripts to `gen-*.sh` in order to generate accessors
+for your required language.

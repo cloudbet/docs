@@ -1,0 +1,18 @@
+```php
+<?php
+require 'protobuf';
+
+// Upcoming Events
+// Endpoint: /api/v2/sports/upcoming/<sportId>
+
+$upcomingEvents = new \Sportsbook\EventList();
+$sportId = 1;
+
+try {
+	$upcomingEvents->parseFromString(getApiResponse('upcoming/' . $sportId));
+} catch (Exception $e) {
+	die('Unable to get upcoming events: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Upcoming events: ' . count($upcomingEvents->getEvents()) . ' events for sport #' . $sportId . PHP_EOL;
+```

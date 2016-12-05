@@ -1,0 +1,32 @@
+```php
+<?php
+require 'protobuf';
+
+$jwtToken = 'Paste your api key';
+
+// Simple function to obtain the API response
+function getApiResponse($method)
+{
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_URL, 'https://api.cloudbet.com/api/v1/sports/' . $method);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'Accept: application/octet-stream',
+		'Authorization: bearer ' . $jwtToken
+	));
+	$response = curl_exec($ch);
+	$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	curl_close($ch);
+
+	if ($code !== 200) {
+		throw new Exception('Response with error code ' . $code . ' received');
+	}
+
+	if (empty($response)) {
+		throw new Exception('Empty response received');
+	}
+
+	return $response;
+}
+```

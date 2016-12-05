@@ -1,0 +1,20 @@
+```php
+<?php
+require 'authentication';
+
+// Competition
+// Endpoint: /api/v2/sports/competition/<competitionId>
+// Optional query params:
+//  * since - competition will only contain events with start date greater or equal to provided value (UNIX timestamp)
+
+$competition = new \Sportsbook\CompetitionTree();
+
+try {
+	$competition->parseFromString(getApiResponse('competition/' . $event->getCompetition()->getId()));
+} catch (Exception $e) {
+	die('Unable to get competition: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Competition #' . $competition->getId() . ': "' . $competition->getName() . '" with ' . count($competition->getEvents()) . ' events' . PHP_EOL;
+
+```

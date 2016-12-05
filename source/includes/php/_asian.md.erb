@@ -1,0 +1,22 @@
+```php
+<?php
+
+require 'authentication';
+
+// Asian Events
+// Endpoint: /api/v2/sports/asian_events/<sportId>
+// Optional query params:
+//  * from - start date (UNIX timestamp)
+//  * to   - end date (UNIX timestamp)
+
+$asianEvents = new \Sportsbook\EventList();
+$sportId = 3;
+
+try {
+	$asianEvents->parseFromString(getApiResponse('asian_events/' . $sportId));
+} catch (Exception $e) {
+	die('Unable to get asian events: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Asian events: ' . count($asianEvents->getEvents()) . ' events for sport #' . $sportId . PHP_EOL;
+```

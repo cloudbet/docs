@@ -1,0 +1,17 @@
+```php
+<?php
+
+// Outright
+// Endpoint: /api/v2/sports/outright/<outrightId>
+
+$outright = new \Sportsbook\Outright();
+
+try {
+	$outright->parseFromString(getApiResponse('outright/' . $outrightIds[array_rand($outrightIds)]));
+} catch (Exception $e) {
+	die('Unable to get outright: ' . $e->getMessage() . PHP_EOL);
+}
+
+echo 'Outright #' . $outright->getId() . ': "' . $outright->getName() . '" for competition "' . $outright->getCompetition()->getName() . '" with ' . count($outright->getSelections()) . ' selections' . PHP_EOL;
+
+```

@@ -1,0 +1,21 @@
+```php
+<?php
+if (!function_exists('curl_init')) {
+	die('cURL extension is not installed' . PHP_EOL);
+}
+
+// Simple autoloader for our generated classes
+spl_autoload_register(function ($className) {
+	if ($className[0] == '\\') {
+		$className = substr($className, 1);
+	}
+	if (strpos($className, 'Sportsbook\\') === 0) {
+		$fileName = __DIR__ . '/php-sportsbook/' . strtr($className, '\\', DIRECTORY_SEPARATOR) . '.php';
+		if (file_exists($fileName)) {
+			include $fileName;
+
+			return true;
+		}
+	}
+});
+```
