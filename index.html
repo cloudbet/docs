@@ -374,97 +374,49 @@ You must replace <code>TOKEN</code> with your personal API key.
 <span class="k">echo</span> <span class="s1">'Upcoming events: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 </code></pre>
 
-          <h1 id="authentication">Authentication</h1>
+          <h1 id="popular-events">Popular Events</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'protobuf'</span><span class="p">;</span>
+<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
 
-<span class="nv">$jwtToken</span> <span class="o">=</span> <span class="s1">'Paste your api key'</span><span class="p">;</span>
+<span class="c1">// Popular Events
+// Endpoint: /api/v2/sports/popular/&lt;sportId&gt;
+</span>
+<span class="nv">$popularEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
+<span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 
-<span class="c1">// Simple function to obtain the API response
-</span><span class="k">function</span> <span class="nf">getApiResponse</span><span class="p">(</span><span class="nv">$method</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$ch</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">();</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_RETURNTRANSFER</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="s1">'https://api.cloudbet.com/api/v1/sports/'</span> <span class="o">.</span> <span class="nv">$method</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HTTPHEADER</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'Accept: application/octet-stream'</span><span class="p">,</span>
-        <span class="s1">'Authorization: bearer '</span> <span class="o">.</span> <span class="nv">$jwtToken</span>
-    <span class="p">));</span>
-    <span class="nv">$response</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
-    <span class="nv">$code</span> <span class="o">=</span> <span class="nb">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLINFO_HTTP_CODE</span><span class="p">);</span>
-    <span class="nb">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$code</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Response with error code '</span> <span class="o">.</span> <span class="nv">$code</span> <span class="o">.</span> <span class="s1">' received'</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$response</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Empty response received'</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$popularEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'popular/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get popular events: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
+
+<span class="k">echo</span> <span class="s1">'Popular events: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$popularEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 </code></pre>
 
-<p>The Cloudbet API uses JSON Web Tokens or <a href="https://jwt.io">JWTs</a> to allow secure access to the API.</p>
-
-<p>You can register for an API key at our <a href="https://affiliates.cloudbet.com/en/affiliates/sign_up">affiliate portal</a>.</p>
-
-<p>Our API expects for the API key to be included in all API requests to the server in a HTTP header that looks like the following:</p>
-
-<p><code class="prettyprint">Authorization: bearer TOKEN</code></p>
-
-<aside class="notice">
-You must replace <code>TOKEN</code> with your personal API key.
-</aside>
-
-          <h1 id="authentication">Authentication</h1>
+          <h1 id="outrights">Outrights</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'protobuf'</span><span class="p">;</span>
+<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
 
-<span class="nv">$jwtToken</span> <span class="o">=</span> <span class="s1">'Paste your api key'</span><span class="p">;</span>
+<span class="c1">// Outrights
+// Endpoint: /api/v2/sports/outright_list/&lt;sportId&gt;
+</span>
+<span class="nv">$outrights</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\OutrightList</span><span class="p">();</span>
+<span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 
-<span class="c1">// Simple function to obtain the API response
-</span><span class="k">function</span> <span class="nf">getApiResponse</span><span class="p">(</span><span class="nv">$method</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$ch</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">();</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_RETURNTRANSFER</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="s1">'https://api.cloudbet.com/api/v1/sports/'</span> <span class="o">.</span> <span class="nv">$method</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HTTPHEADER</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'Accept: application/octet-stream'</span><span class="p">,</span>
-        <span class="s1">'Authorization: bearer '</span> <span class="o">.</span> <span class="nv">$jwtToken</span>
-    <span class="p">));</span>
-    <span class="nv">$response</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
-    <span class="nv">$code</span> <span class="o">=</span> <span class="nb">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLINFO_HTTP_CODE</span><span class="p">);</span>
-    <span class="nb">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$code</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Response with error code '</span> <span class="o">.</span> <span class="nv">$code</span> <span class="o">.</span> <span class="s1">' received'</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$response</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Empty response received'</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$outrights</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'outright_list/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get outrights list: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
+
+<span class="nv">$outrightIds</span> <span class="o">=</span> <span class="nb">array_values</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Outright</span> <span class="nv">$outright</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">();</span>
+<span class="p">},</span> <span class="nv">$outrights</span><span class="o">-&gt;</span><span class="na">getOutrights</span><span class="p">()));</span>
+
+<span class="k">echo</span> <span class="s1">'Outrights: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$outrightIds</span><span class="p">)</span> <span class="o">.</span> <span class="s1">' outrights for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 </code></pre>
-
-<p>The Cloudbet API uses JSON Web Tokens or <a href="https://jwt.io">JWTs</a> to allow secure access to the API.</p>
-
-<p>You can register for an API key at our <a href="https://affiliates.cloudbet.com/en/affiliates/sign_up">affiliate portal</a>.</p>
-
-<p>Our API expects for the API key to be included in all API requests to the server in a HTTP header that looks like the following:</p>
-
-<p><code class="prettyprint">Authorization: bearer TOKEN</code></p>
-
-<aside class="notice">
-You must replace <code>TOKEN</code> with your personal API key.
-</aside>
 
           <h1 id="outright">Outright</h1>
 
