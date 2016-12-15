@@ -143,20 +143,10 @@ apt-get install protobuf-compiler
 brew install protobuf
 </aside>
 
-<h3 id="generate-source-example">Generate Source Example</h3>
-
-<aside>
-protoc &ndash;go_out=. feed.proto
-</aside>
-
 <h2 id="language-specific-bindings">Language specific bindings</h2>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">function_exists</span><span class="p">(</span><span class="s1">'curl_init'</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s1">'cURL extension is not installed'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// Simple autoloader for our generated classes
+<span class="c1">// Simple autoloader for generated protobuf classes
 </span><span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$className</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nv">$className</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'\\'</span><span class="p">)</span> <span class="p">{</span>
         <span class="nv">$className</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$className</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
@@ -170,7 +160,12 @@ protoc &ndash;go_out=. feed.proto
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">});</span>
+
 </code></pre>
+
+<p>Our Protobuf schema can be found on <a href="https://github.com/Cloudbet/schema">Github</a></p>
+
+<p>Check one of the sample scripts to <code class="prettyprint">gen-*.sh</code> in order to generate accessors for your required language as below/</p>
 
 <h4 id="ruby">Ruby:</h4>
 
@@ -194,47 +189,32 @@ easy_install -d ~/python protobuf
 
 <h4 id="php">PHP:</h4>
 
-<p>Install <a href="https://github.com/allegro/php-protobuf">protobuf</a> PHP extension as described in the project README</p>
-
-<h2 id="usage">Usage</h2>
-
-<h3 id="examples">Examples</h3>
-
-<h4 id="php">PHP</h4>
-
-<ol>
-<li>Run <code class="prettyprint">./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php</code> to compile messages from a proto file.</li>
-<li>Run <code class="prettyprint">php example.php</code> to decode random API responses. The output produced should be similar to following:</li>
-</ol>
-
-<h3 id="application-setup-example">Application Setup Example</h3>
+<p>Install <a href="https://github.com/allegro/php-protobuf">this</a> protobuf PHP extension as described in the project&rsquo;s README.</p>
 
 <aside>
-mkdir protobuf
-echo &rsquo;*\n!.gitignore\n!schema&rsquo; > protobuf/.gitignore
-git submodule add git@github.com:cloudbet/api-schema.git protobuf/schema
+./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php
 </aside>
 
-<p>Check one of the sample scripts to <code class="prettyprint">gen-*.sh</code> in order to generate accessors
-for your required language.</p>
+<p>n.b. This was tested using <a href="https://github.com/phpbrew/phpbrew">phpbrew</a> and PHP version 5.6.18 (7+ is not supported yet).</p>
 
           <h1 id="authentication">Authentication</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'protobuf'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/protobuf.php'</span><span class="p">;</span>
 
-<span class="nv">$jwtToken</span> <span class="o">=</span> <span class="s1">'Paste your api key'</span><span class="p">;</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">'JWT_TOKEN'</span><span class="p">,</span> <span class="s1">'Paste your api key'</span><span class="p">);</span>
 
 <span class="c1">// Simple function to obtain the API response
-</span><span class="k">function</span> <span class="nf">getApiResponse</span><span class="p">(</span><span class="nv">$method</span><span class="p">)</span>
+</span><span class="k">function</span> <span class="nf">getApiResponse</span><span class="p">(</span><span class="nv">$method</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$isBinary</span> <span class="o">=</span> <span class="kc">true</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="nv">$ch</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">();</span>
     <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
     <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_RETURNTRANSFER</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="s1">'https://api.cloudbet.com/api/v1/sports/'</span> <span class="o">.</span> <span class="nv">$method</span><span class="p">);</span>
+    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_USERAGENT</span><span class="p">,</span> <span class="s1">'Public API Client/1.0'</span><span class="p">);</span>
+    <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="s1">'https://api.cloudbet.com/api/v1/sports'</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$method</span> <span class="o">===</span> <span class="s1">''</span> <span class="o">?</span> <span class="s1">''</span> <span class="o">:</span> <span class="s1">'/'</span><span class="p">)</span> <span class="o">.</span> <span class="nv">$method</span><span class="p">);</span>
     <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HTTPHEADER</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'Accept: application/octet-stream'</span><span class="p">,</span>
-        <span class="s1">'Authorization: bearer '</span> <span class="o">.</span> <span class="nv">$jwtToken</span>
+        <span class="s1">'Accept: application/'</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$isBinary</span> <span class="o">?</span> <span class="s1">'octet-stream'</span> <span class="o">:</span> <span class="s1">'json'</span><span class="p">),</span>
+        <span class="s1">'Authorization: Bearer '</span> <span class="o">.</span> <span class="nx">JWT_TOKEN</span><span class="p">,</span>
     <span class="p">));</span>
     <span class="nv">$response</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
     <span class="nv">$code</span> <span class="o">=</span> <span class="nb">curl_getinfo</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLINFO_HTTP_CODE</span><span class="p">);</span>
@@ -244,12 +224,16 @@ for your required language.</p>
         <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Response with error code '</span> <span class="o">.</span> <span class="nv">$code</span> <span class="o">.</span> <span class="s1">' received'</span><span class="p">);</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$response</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Empty response received'</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$isBinary</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nv">$response</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$response</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">'Invalid response received'</span><span class="p">);</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
 <span class="p">}</span>
+
 </code></pre>
 
 <p>The Cloudbet API uses JSON Web Tokens or <a href="https://jwt.io">JWTs</a> to allow secure access to the API.</p>
@@ -267,21 +251,192 @@ You must replace <code>TOKEN</code> with your personal API key.
           <h1 id="sports">Sports</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
 
 <span class="c1">// Sports
-// Endpoint: /api/v2/sports
+// Endpoint: /api/v1/sports
 </span>
-<span class="c1">// TODO: This needs finishing
-</span></code></pre>
+<span class="nv">$sportsList</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\SportsList</span><span class="p">();</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$sportsList</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">());</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get sports: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$sportsList</span><span class="o">-&gt;</span><span class="na">getSportsCount</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'No sports were found'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'Sports list'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'ID'</span><span class="p">,</span>
+        <span class="s1">'Key'</span><span class="p">,</span>
+        <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$sportsList</span><span class="o">-&gt;</span><span class="na">getSports</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$sport</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+            <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getKey</span><span class="p">(),</span>
+            <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
+<span class="p">}</span>
+
+</code></pre>
+
+<p>The Sports end point is important for understand all the other calls you&rsquo;ll make to the API.</p>
+
+<p>To improve performance most end points will return sport ids rather than names.</p>
+
+<p>To understand which ids are which sport you&rsquo;ll need to parse the response of this API first.</p>
+
+          <h1 id="markets">Markets</h1>
+
+<pre class="highlight php"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
+
+<span class="c1">// Markets
+// Endpoint: /api/v1/sports/markets
+</span>
+<span class="nv">$markets</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$markets</span> <span class="o">=</span> <span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'markets'</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get markets: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$markets</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'No markets were found'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'Markets'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'ID'</span><span class="p">,</span>
+        <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$markets</span> <span class="k">as</span> <span class="nv">$market</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nv">$market</span><span class="p">[</span><span class="s1">'id'</span><span class="p">],</span>
+            <span class="nv">$market</span><span class="p">[</span><span class="s1">'name'</span><span class="p">],</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
+<span class="p">}</span>
+
+</code></pre>
+
+<p>The Markets end point is important for understand all the other calls you&rsquo;ll make to the API.</p>
+
+<p>To improve performance most end points will return market ids rather than names.</p>
+
+<p>To understand which ids are which market you&rsquo;ll need to parse the response of this API first.</p>
+
+          <h1 id="event-tree">Event Tree</h1>
+
+<pre class="highlight php"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
+
+<span class="c1">// Event Tree
+// Endpoint: /api/v1/event_tree
+</span>
+<span class="nv">$eventTree</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventTree</span><span class="p">();</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$eventTree</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'event_tree'</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get event tree: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$eventTree</span><span class="o">-&gt;</span><span class="na">getSports</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$sport</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$competitionsCount</span> <span class="o">=</span> <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getCompetitionsCount</span><span class="p">();</span>
+    <span class="k">echo</span> <span class="p">(</span><span class="nv">$competitionsCount</span> <span class="o">?</span> <span class="s1">'+'</span> <span class="o">:</span> <span class="s1">'-'</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'- Sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getCompetitions</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$competition</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">'+-'</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getGroupsCount</span><span class="p">()</span> <span class="o">?</span> <span class="s1">'+'</span> <span class="o">:</span> <span class="s1">'-'</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'- Competition "'</span> <span class="o">.</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getGroups</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$group</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nv">$competitionsCount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'|'</span> <span class="o">:</span> <span class="s1">' '</span><span class="p">)</span> <span class="o">.</span> <span class="s1">' +- Group "'</span> <span class="o">.</span> <span class="nv">$group</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre>
+
+<p>The Event Tree end point will allow you to discover all the competitions we have available for all sports.</p>
+
+<p>It is exposed as a navigable tree to be easy to parse.</p>
+
+          <h1 id="competition">Competition</h1>
+
+<pre class="highlight php"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
+
+<span class="c1">// Competition
+// Endpoint: /api/v1/sports/competition/&lt;competitionId&gt;
+// Optional query params:
+//  * since - competition will only contain events with start date greater or equal to provided value (UNIX timestamp)
+</span>
+<span class="nv">$competition</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\CompetitionTree</span><span class="p">();</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'competition/'</span> <span class="o">.</span> <span class="nv">$competitionId</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get competition: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="s1">'Competition "'</span> <span class="o">.</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" with '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">'ID'</span><span class="p">,</span>
+    <span class="s1">'Name'</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+        <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+        <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">())),</span>
+    <span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
+
+<span class="c1">// Obtaining timestamp of a random event to use it as a `since` param
+</span><span class="nv">$since</span> <span class="o">=</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getEventsAt</span><span class="p">(</span><span class="nb">floor</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span><span class="o">-&gt;</span><span class="na">getTimestamp</span><span class="p">();</span>
+
+<span class="nv">$updatedCompetition</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\CompetitionTree</span><span class="p">();</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$updatedCompetition</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'competition/'</span> <span class="o">.</span> <span class="nv">$competitionId</span> <span class="o">.</span> <span class="s1">'?'</span> <span class="o">.</span> <span class="nb">http_build_query</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'since'</span> <span class="o">=&gt;</span> <span class="nv">$since</span><span class="p">,</span>
+    <span class="p">))));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get competition: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="nx">PHP_EOL</span> <span class="o">.</span> <span class="s1">'Competition "'</span> <span class="o">.</span> <span class="nv">$updatedCompetition</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" with '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$updatedCompetition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events updated since '</span> <span class="o">.</span> <span class="nb">date</span><span class="p">(</span><span class="s1">'d.m.Y H:i:s'</span><span class="p">,</span> <span class="nv">$since</span><span class="p">)</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">'ID'</span><span class="p">,</span>
+    <span class="s1">'Name'</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$updatedCompetition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+        <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+        <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">())),</span>
+    <span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
+
+</code></pre>
+
+<p>The Competition end point will return you all the upcoming events for the selected competition.</p>
+
+<p>It will include a small selection (2-4) of the most popular markets for this competition.</p>
 
           <h1 id="live-events">Live Events</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
 
 <span class="c1">// Live Events
-// Endpoint: /api/v2/sports/live_events
+// Endpoint: /api/v1/sports/live_events
 </span>
 <span class="nv">$liveEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
 
@@ -291,62 +446,43 @@ You must replace <code>TOKEN</code> with your personal API key.
     <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get live events: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="nv">$eventIds</span> <span class="o">=</span> <span class="nb">array_values</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Event</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">();</span>
-<span class="p">},</span> <span class="nv">$liveEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()));</span>
-
-<span class="nv">$sportIds</span> <span class="o">=</span> <span class="nb">array_values</span><span class="p">(</span><span class="nb">array_unique</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Event</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getSport</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">();</span>
-<span class="p">},</span> <span class="nv">$liveEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())));</span>
-
-<span class="k">echo</span> <span class="s1">'Live events: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$eventIds</span><span class="p">)</span> <span class="o">.</span> <span class="s1">' events in '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$sportIds</span><span class="p">)</span> <span class="o">.</span> <span class="s1">' sports'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
-</code></pre>
-
-          <h1 id="event-tree">Event Tree</h1>
-
-<pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
-
-<span class="c1">// Sports
-// Endpoint: /api/v2/event_tree
-</span>
-<span class="c1">// TODO: This needs finishing
-</span></code></pre>
-
-          <h1 id="competition">Competition</h1>
-
-<pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
-
-<span class="c1">// Competition
-// Endpoint: /api/v2/sports/competition/&lt;competitionId&gt;
-// Optional query params:
-//  * since - competition will only contain events with start date greater or equal to provided value (UNIX timestamp)
-</span>
-<span class="nv">$competition</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\CompetitionTree</span><span class="p">();</span>
-
-<span class="k">try</span> <span class="p">{</span>
-    <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'competition/'</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetition</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()));</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get competition: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$liveEvents</span><span class="o">-&gt;</span><span class="na">getEventsCount</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'No live events were found'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'Live events'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'ID'</span><span class="p">,</span>
+        <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$liveEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+            <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+            <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">())),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="k">echo</span> <span class="s1">'Competition #'</span> <span class="o">.</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s1">': "'</span> <span class="o">.</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" with '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
-
 </code></pre>
+
+<p>The Live Events end point will return a list of all the currently live events.</p>
+
+<p>It will also return the current primary market. This is the market we deem most important for this sport.</p>
 
           <h1 id="event">Event</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
 
 <span class="c1">// Event
-// Endpoint: /api/v2/sports/event/&lt;eventId&gt;
+// Endpoint: /api/v1/sports/event/&lt;eventId&gt;
 </span>
 <span class="nv">$event</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\Event</span><span class="p">();</span>
 
 <span class="k">try</span> <span class="p">{</span>
-    <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'event/'</span> <span class="o">.</span> <span class="nv">$eventIds</span><span class="p">[</span><span class="nb">array_rand</span><span class="p">(</span><span class="nv">$eventIds</span><span class="p">)]));</span>
+    <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'event/'</span> <span class="o">.</span> <span class="nv">$eventId</span><span class="p">));</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get event: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
@@ -354,18 +490,79 @@ You must replace <code>TOKEN</code> with your personal API key.
 <span class="k">echo</span> <span class="s1">'Event #'</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s1">': '</span> <span class="o">.</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
 <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">()))</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+
 </code></pre>
+
+<p>The Event end point will return you every single market for the selected event.</p>
+
+<p>It will work the same way for both pre-match and live events and ids for events will not change through their life-cycle.</p>
+
+<p>You can get the current score from this end point.</p>
+
+          <h1 id="asian">Asian</h1>
+
+<pre class="highlight php"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
+
+<span class="c1">// Asian Events
+// Endpoint: /api/v1/sports/asian_events/&lt;sportId&gt;
+// Optional query params:
+//  * from - start date (UNIX timestamp)
+//  * to   - end date (UNIX timestamp)
+</span>
+<span class="nv">$asianEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$asianEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'asian_events/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get asian events: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$asianEvents</span><span class="o">-&gt;</span><span class="na">getEventsCount</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'No asian events were found for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'Asian events for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'ID'</span><span class="p">,</span>
+        <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$asianEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+            <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+            <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">())),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
+<span class="p">}</span>
+
+</code></pre>
+
+<p>The Asian end point provides you an API specific to rendering interaces useful for Asian audiences.</p>
+
+<p>It will return all the events starting within the specified time period.</p>
+
+<p>It will return only the following markets:</p>
+
+<ul>
+<li>Moneyline/Winner markets (2 or 3 selections)</li>
+<li>Asian Handicap (Multiple 2 selection lines)</li>
+<li>Totals (Multiple 2 selection lines)</li>
+<li>1st Half Moneyline/Winner markets (2 or 3 selections)</li>
+<li>1st Half Asian Handicap (Multiple 2 selection lines)</li>
+<li>1st Totals (Multiple 2 selection lines)</li>
+</ul>
 
           <h1 id="upcoming-events">Upcoming Events</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'protobuf'</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
 
 <span class="c1">// Upcoming Events
-// Endpoint: /api/v2/sports/upcoming/&lt;sportId&gt;
+// Endpoint: /api/v1/sports/upcoming/&lt;sportId&gt;
 </span>
 <span class="nv">$upcomingEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
-<span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'upcoming/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
@@ -373,71 +570,71 @@ You must replace <code>TOKEN</code> with your personal API key.
     <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get upcoming events: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="k">echo</span> <span class="s1">'Upcoming events: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
-</code></pre>
-
-          <h1 id="popular-events">Popular Events</h1>
-
-<pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
-
-<span class="c1">// Popular Events
-// Endpoint: /api/v2/sports/popular/&lt;sportId&gt;
-</span>
-<span class="nv">$popularEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
-<span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-
-<span class="k">try</span> <span class="p">{</span>
-    <span class="nv">$popularEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'popular/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get popular events: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">getEventsCount</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'No upcoming events were found for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'Upcoming events for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">'ID'</span><span class="p">,</span>
+        <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="p">));</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">(),</span>
+            <span class="nb">implode</span><span class="p">(</span><span class="s1">' vs '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Competitor</span> <span class="nv">$competitor</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$competitor</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+            <span class="p">},</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getCompetitors</span><span class="p">())),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="k">echo</span> <span class="s1">'Popular events: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$popularEvents</span><span class="o">-&gt;</span><span class="na">getEvents</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' events for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 </code></pre>
 
-          <h1 id="outrights">Outrights</h1>
+<p>The upcoming events end point returns a short list of events about to start.</p>
 
-<pre class="highlight php"><code><span class="cp">&lt;?php</span>
-<span class="k">require</span> <span class="s1">'authentication'</span><span class="p">;</span>
-
-<span class="c1">// Outrights
-// Endpoint: /api/v2/sports/outright_list/&lt;sportId&gt;
-</span>
-<span class="nv">$outrights</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\OutrightList</span><span class="p">();</span>
-<span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-
-<span class="k">try</span> <span class="p">{</span>
-    <span class="nv">$outrights</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'outright_list/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get outrights list: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nv">$outrightIds</span> <span class="o">=</span> <span class="nb">array_values</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nx">\Sportsbook\Outright</span> <span class="nv">$outright</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">();</span>
-<span class="p">},</span> <span class="nv">$outrights</span><span class="o">-&gt;</span><span class="na">getOutrights</span><span class="p">()));</span>
-
-<span class="k">echo</span> <span class="s1">'Outrights: '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$outrightIds</span><span class="p">)</span> <span class="o">.</span> <span class="s1">' outrights for sport #'</span> <span class="o">.</span> <span class="nv">$sportId</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
-</code></pre>
+<p>This end point can be filtered by sport id or show all across all sports.</p>
 
           <h1 id="outright">Outright</h1>
 
 <pre class="highlight php"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/authentication.php'</span><span class="p">;</span>
 
 <span class="c1">// Outright
-// Endpoint: /api/v2/sports/outright/&lt;outrightId&gt;
+// Endpoint: /api/v1/sports/outright/&lt;outrightId&gt;
 </span>
 <span class="nv">$outright</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\Outright</span><span class="p">();</span>
 
 <span class="k">try</span> <span class="p">{</span>
-    <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'outright/'</span> <span class="o">.</span> <span class="nv">$outrightIds</span><span class="p">[</span><span class="nb">array_rand</span><span class="p">(</span><span class="nv">$outrightIds</span><span class="p">)]));</span>
+    <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'outright/'</span> <span class="o">.</span> <span class="nv">$outrightId</span><span class="p">));</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">die</span><span class="p">(</span><span class="s1">'Unable to get outright: '</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="k">echo</span> <span class="s1">'Outright #'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s1">': "'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" for competition "'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getCompetition</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" with '</span> <span class="o">.</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getSelections</span><span class="p">())</span> <span class="o">.</span> <span class="s1">' selections'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">'Outright #'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s1">': "'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'" for competition "'</span> <span class="o">.</span> <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getCompetition</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">'Name'</span><span class="p">,</span>
+    <span class="s1">'Status'</span><span class="p">,</span>
+    <span class="s1">'Min Stake'</span><span class="p">,</span>
+    <span class="s1">'Max Stake'</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="nv">$selectionStatus</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\SelectionStatus</span><span class="p">();</span>
+<span class="nv">$selectionStatuses</span> <span class="o">=</span> <span class="nb">array_flip</span><span class="p">(</span><span class="nv">$selectionStatus</span><span class="o">-&gt;</span><span class="na">getEnumValues</span><span class="p">());</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">getSelections</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$selection</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">row</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="nv">$selection</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span>
+        <span class="nv">$selectionStatuses</span><span class="p">[</span><span class="nv">$selection</span><span class="o">-&gt;</span><span class="na">getStatus</span><span class="p">()],</span>
+        <span class="nv">$selection</span><span class="o">-&gt;</span><span class="na">getMinStake</span><span class="p">(),</span>
+        <span class="nv">$selection</span><span class="o">-&gt;</span><span class="na">getMaxStake</span><span class="p">(),</span>
+    <span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">$renderer</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span>
 
 </code></pre>
+
+<p>The Outright end point will return you the selections availble for a particular outright market.</p>
+
+<p>Available outright markets are exposed in the competition API.</p>
 
           <h1 id="errors">Errors</h1>
 
