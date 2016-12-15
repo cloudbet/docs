@@ -1,10 +1,6 @@
 ```php
 <?php
-if (!function_exists('curl_init')) {
-	die('cURL extension is not installed' . PHP_EOL);
-}
-
-// Simple autoloader for our generated classes
+// Simple autoloader for generated protobuf classes
 spl_autoload_register(function ($className) {
 	if ($className[0] == '\\') {
 		$className = substr($className, 1);
@@ -18,4 +14,5 @@ spl_autoload_register(function ($className) {
 		}
 	}
 });
+
 ```

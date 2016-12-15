@@ -1,19 +1,20 @@
 ```php
 <?php
-require 'protobuf';
+require_once __DIR__ . '/protobuf.php';
 
-$jwtToken = 'Paste your api key';
+define('JWT_TOKEN', 'Paste your api key');
 
 // Simple function to obtain the API response
-function getApiResponse($method)
+function getApiResponse($method = '', $isBinary = true)
 {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_HEADER, 0);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_URL, 'https://api.cloudbet.com/api/v1/sports/' . $method);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Public API Client/1.0');
+	curl_setopt($ch, CURLOPT_URL, 'https://api.cloudbet.com/api/v1/sports' . ($method === '' ? '' : '/') . $method);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		'Accept: application/octet-stream',
-		'Authorization: bearer ' . $jwtToken
+		'Accept: application/' . ($isBinary ? 'octet-stream' : 'json'),
+		'Authorization: Bearer ' . JWT_TOKEN,
 	));
 	$response = curl_exec($ch);
 	$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -23,10 +24,14 @@ function getApiResponse($method)
 		throw new Exception('Response with error code ' . $code . ' received');
 	}
 
-	if (empty($response)) {
-		throw new Exception('Empty response received');
+	if (!$isBinary) {
+		$response = json_decode($response, true);
+		if (!is_array($response)) {
+			throw new Exception('Invalid response received');
+		}
 	}
 
 	return $response;
 }
+
 ```

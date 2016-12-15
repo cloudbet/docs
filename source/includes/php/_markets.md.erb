@@ -1,0 +1,32 @@
+```php
+<?php
+require_once __DIR__ . '/authentication.php';
+
+// Markets
+// Endpoint: /api/v1/sports/markets
+
+$markets = null;
+try {
+	$markets = getApiResponse('markets', false);
+} catch (Exception $e) {
+	die('Unable to get markets: ' . $e->getMessage() . PHP_EOL);
+}
+
+if (!$markets) {
+	echo 'No markets were found' . PHP_EOL;
+} else {
+	echo 'Markets' . PHP_EOL;
+	$renderer = new TableRenderer(array(
+		'ID',
+		'Name',
+	));
+	foreach ($markets as $market) {
+		$renderer->row(array(
+			$market['id'],
+			$market['name'],
+		));
+	}
+	$renderer->end();
+}
+
+```

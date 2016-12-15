@@ -1,9 +1,9 @@
 ```php
 <?php
-require 'authentication';
+require_once __DIR__ . '/authentication.php';
 
 // Live Events
-// Endpoint: /api/v2/sports/live_events
+// Endpoint: /api/v1/sports/live_events
 
 $liveEvents = new \Sportsbook\EventList();
 
@@ -13,13 +13,23 @@ try {
 	die('Unable to get live events: ' . $e->getMessage() . PHP_EOL);
 }
 
-$eventIds = array_values(array_map(function (\Sportsbook\Event $event) {
-	return $event->getId();
-}, $liveEvents->getEvents()));
+if (!$liveEvents->getEventsCount()) {
+	echo 'No live events were found' . PHP_EOL;
+} else {
+	echo 'Live events' . PHP_EOL;
+	$renderer = new TableRenderer(array(
+		'ID',
+		'Name',
+	));
+	foreach ($liveEvents->getEvents() as $event) {
+		$renderer->row(array(
+			$event->getId(),
+			implode(' vs ', array_map(function (\Sportsbook\Competitor $competitor) {
+				return $competitor->getName();
+			}, $event->getCompetitors())),
+		));
+	}
+	$renderer->end();
+}
 
-$sportIds = array_values(array_unique(array_map(function (\Sportsbook\Event $event) {
-	return $event->getSport()->getId();
-}, $liveEvents->getEvents())));
-
-echo 'Live events: ' . count($eventIds) . ' events in ' . count($sportIds) . ' sports' . PHP_EOL;
 ```

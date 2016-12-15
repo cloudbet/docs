@@ -1,9 +1,35 @@
 ```php
 <?php
-require 'authentication';
+require_once __DIR__ . '/authentication.php';
 
 // Sports
-// Endpoint: /api/v2/sports
+// Endpoint: /api/v1/sports
 
-// TODO: This needs finishing
+$sportsList = new \Sportsbook\SportsList();
+
+try {
+	$sportsList->parseFromString(getApiResponse());
+} catch (Exception $e) {
+	die('Unable to get sports: ' . $e->getMessage() . PHP_EOL);
+}
+
+if (!$sportsList->getSportsCount()) {
+	echo 'No sports were found' . PHP_EOL;
+} else {
+	echo 'Sports list' . PHP_EOL;
+	$renderer = new TableRenderer(array(
+		'ID',
+		'Key',
+		'Name',
+	));
+	foreach ($sportsList->getSports() as $sport) {
+		$renderer->row(array(
+			$sport->getId(),
+			$sport->getKey(),
+			$sport->getName(),
+		));
+	}
+	$renderer->end();
+}
+
 ```

@@ -1,16 +1,14 @@
 ```php
 <?php
-
-require 'authentication';
+require_once __DIR__ . '/authentication.php';
 
 // Asian Events
-// Endpoint: /api/v2/sports/asian_events/<sportId>
+// Endpoint: /api/v1/sports/asian_events/<sportId>
 // Optional query params:
 //  * from - start date (UNIX timestamp)
 //  * to   - end date (UNIX timestamp)
 
 $asianEvents = new \Sportsbook\EventList();
-$sportId = 3;
 
 try {
 	$asianEvents->parseFromString(getApiResponse('asian_events/' . $sportId));
@@ -18,5 +16,23 @@ try {
 	die('Unable to get asian events: ' . $e->getMessage() . PHP_EOL);
 }
 
-echo 'Asian events: ' . count($asianEvents->getEvents()) . ' events for sport #' . $sportId . PHP_EOL;
+if (!$asianEvents->getEventsCount()) {
+	echo 'No asian events were found for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+} else {
+	echo 'Asian events for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	$renderer = new TableRenderer(array(
+		'ID',
+		'Name',
+	));
+	foreach ($asianEvents->getEvents() as $event) {
+		$renderer->row(array(
+			$event->getId(),
+			implode(' vs ', array_map(function (\Sportsbook\Competitor $competitor) {
+				return $competitor->getName();
+			}, $event->getCompetitors())),
+		));
+	}
+	$renderer->end();
+}
+
 ```

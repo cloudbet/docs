@@ -1,12 +1,11 @@
 ```php
 <?php
-require 'protobuf';
+require_once __DIR__ . '/authentication.php';
 
 // Upcoming Events
-// Endpoint: /api/v2/sports/upcoming/<sportId>
+// Endpoint: /api/v1/sports/upcoming/<sportId>
 
 $upcomingEvents = new \Sportsbook\EventList();
-$sportId = 1;
 
 try {
 	$upcomingEvents->parseFromString(getApiResponse('upcoming/' . $sportId));
@@ -14,5 +13,23 @@ try {
 	die('Unable to get upcoming events: ' . $e->getMessage() . PHP_EOL);
 }
 
-echo 'Upcoming events: ' . count($upcomingEvents->getEvents()) . ' events for sport #' . $sportId . PHP_EOL;
+if (!$upcomingEvents->getEventsCount()) {
+	echo 'No upcoming events were found for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+} else {
+	echo 'Upcoming events for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	$renderer = new TableRenderer(array(
+		'ID',
+		'Name',
+	));
+	foreach ($upcomingEvents->getEvents() as $event) {
+		$renderer->row(array(
+			$event->getId(),
+			implode(' vs ', array_map(function (\Sportsbook\Competitor $competitor) {
+				return $competitor->getName();
+			}, $event->getCompetitors())),
+		));
+	}
+	$renderer->end();
+}
+
 ```
