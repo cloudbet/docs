@@ -12,13 +12,13 @@ includes:
   - protobuf
   - authentication
   - sports
-  - live_events
+  - markets
   - event_tree
   - competition
+  - live_events
   - event
+  - asian
   - upcoming_events
-  - popular_events
-  - outrights
   - outright
   - errors
 

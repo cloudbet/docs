@@ -11,13 +11,13 @@ apt-get install protobuf-compiler
 brew install protobuf
 </aside>
 
-### Generate Source Example
-<aside>
-protoc --go_out=. feed.proto
-</aside>
-
 ## Language specific bindings
 <%= partial 'includes/php/protobuf' %>
+
+Our Protobuf schema can be found on [Github](https://github.com/Cloudbet/schema)
+
+Check one of the sample scripts to `gen-*.sh` in order to generate accessors for your required language as below/
+
 ####Ruby:
 <aside>
 gem install protobuf
@@ -36,23 +36,11 @@ easy_install -d ~/python protobuf
 </aside>
 
 ####PHP:
-Install [protobuf](https://github.com/allegro/php-protobuf) PHP extension as described in the project README
 
-## Usage
-### Examples
-
-#### PHP
-
-1. Run `./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php` to compile messages from a proto file.
-2. Run `php example.php` to decode random API responses. The output produced should be similar to following:
-
-### Application Setup Example
+Install [this](https://github.com/allegro/php-protobuf) protobuf PHP extension as described in the project's README.
 
 <aside>
-mkdir protobuf
-echo '*\n!.gitignore\n!schema' > protobuf/.gitignore
-git submodule add git@github.com:cloudbet/api-schema.git protobuf/schema
+./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php
 </aside>
 
-Check one of the sample scripts to `gen-*.sh` in order to generate accessors
-for your required language.
+n.b. This was tested using [phpbrew](https://github.com/phpbrew/phpbrew) and PHP version 5.6.18 (7+ is not supported yet).
