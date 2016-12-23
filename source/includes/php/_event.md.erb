@@ -7,6 +7,10 @@ require_once __DIR__ . '/authentication.php';
 
 $event = new \Sportsbook\Event();
 
+if (!isset($eventId)) {
+	$eventId = 398437;
+}
+
 try {
 	$event->parseFromString(getApiResponse('event/' . $eventId));
 } catch (Exception $e) {

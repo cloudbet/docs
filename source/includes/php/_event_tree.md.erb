@@ -14,7 +14,7 @@ try {
 }
 foreach ($eventTree->getSports() as $sport) {
 	$competitionsCount = $sport->getCompetitionsCount();
-	echo ($competitionsCount ? '+' : '-') . '- Sport "' . $sportNames[$sport->getId()] . '"' . PHP_EOL;
+	echo ($competitionsCount ? '+' : '-') . '- Sport ' . (isset($sportNames) ? '"' . $sportNames[$sport->getId()] . '"' : '#' . $sport->getId()) . PHP_EOL;
 	foreach ($sport->getCompetitions() as $i => $competition) {
 		echo '+-' . ($competition->getGroupsCount() ? '+' : '-') . '- Competition "' . $competition->getName() . '"' . PHP_EOL;
 		foreach ($competition->getGroups() as $group) {

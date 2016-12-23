@@ -9,6 +9,10 @@ require_once __DIR__ . '/authentication.php';
 
 $competition = new \Sportsbook\CompetitionTree();
 
+if (!isset($competitionId)) {
+	$competitionId = 196;
+}
+
 try {
 	$competition->parseFromString(getApiResponse('competition/' . $competitionId));
 } catch (Exception $e) {

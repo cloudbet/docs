@@ -7,6 +7,10 @@ require_once __DIR__ . '/authentication.php';
 
 $outright = new \Sportsbook\Outright();
 
+if (!isset($outrightId)) {
+	$outrightId = 188134;
+}
+
 try {
 	$outright->parseFromString(getApiResponse('outright/' . $outrightId));
 } catch (Exception $e) {

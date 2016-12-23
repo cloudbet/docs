@@ -6,7 +6,7 @@ spl_autoload_register(function ($className) {
 		$className = substr($className, 1);
 	}
 	if (strpos($className, 'Sportsbook\\') === 0) {
-		$fileName = __DIR__ . '/php-sportsbook/' . strtr($className, '\\', DIRECTORY_SEPARATOR) . '.php';
+		$fileName = __DIR__ . '/' . strtr($className, '\\', DIRECTORY_SEPARATOR) . '.php';		
 		if (file_exists($fileName)) {
 			include $fileName;
 
@@ -14,5 +14,8 @@ spl_autoload_register(function ($className) {
 		}
 	}
 });
+
+# https://github.com/Cloudbet/schema/tree/master/php/helpers
+require_once __DIR__ . '/helpers/TableRenderer.php';
 
 ```

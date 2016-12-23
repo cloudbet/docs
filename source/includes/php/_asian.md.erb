@@ -10,6 +10,10 @@ require_once __DIR__ . '/authentication.php';
 
 $asianEvents = new \Sportsbook\EventList();
 
+if (!isset($sportId)) {
+	$sportId = 3;
+}
+
 try {
 	$asianEvents->parseFromString(getApiResponse('asian_events/' . $sportId));
 } catch (Exception $e) {
@@ -17,9 +21,9 @@ try {
 }
 
 if (!$asianEvents->getEventsCount()) {
-	echo 'No asian events were found for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	echo 'No asian events were found for sport ' . (isset($sportNames) ? '"' . $sportNames[$sportId] . '"' : '#' . $sportId) . PHP_EOL;
 } else {
-	echo 'Asian events for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	echo 'Asian events for sport ' . (isset($sportNames) ? '"' . $sportNames[$sportId] . '"' : '#' . $sportId) . PHP_EOL;
 	$renderer = new TableRenderer(array(
 		'ID',
 		'Name',

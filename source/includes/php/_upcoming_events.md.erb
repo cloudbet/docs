@@ -7,6 +7,10 @@ require_once __DIR__ . '/authentication.php';
 
 $upcomingEvents = new \Sportsbook\EventList();
 
+if (!isset($sportId)) {
+	$sportId = 1;
+}
+
 try {
 	$upcomingEvents->parseFromString(getApiResponse('upcoming/' . $sportId));
 } catch (Exception $e) {
@@ -14,9 +18,9 @@ try {
 }
 
 if (!$upcomingEvents->getEventsCount()) {
-	echo 'No upcoming events were found for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	echo 'No upcoming events were found for sport ' . (isset($sportNames) ? '"' . $sportNames[$sportId] . '"' : '#' . $sportId) . PHP_EOL;
 } else {
-	echo 'Upcoming events for sport "' . $sportNames[$sportId] . '"' . PHP_EOL;
+	echo 'Upcoming events for sport ' . ((isset($sportNames) ? '"' . $sportNames[$sportId] . '"' : '#' . $sportId)) . PHP_EOL;
 	$renderer = new TableRenderer(array(
 		'ID',
 		'Name',
