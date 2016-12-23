@@ -152,7 +152,7 @@ brew install protobuf
         <span class="nv">$className</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$className</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$className</span><span class="p">,</span> <span class="s1">'Sportsbook\\'</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$fileName</span> <span class="o">=</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/php-sportsbook/'</span> <span class="o">.</span> <span class="nb">strtr</span><span class="p">(</span><span class="nv">$className</span><span class="p">,</span> <span class="s1">'\\'</span><span class="p">,</span> <span class="nx">DIRECTORY_SEPARATOR</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'.php'</span><span class="p">;</span>
+        <span class="nv">$fileName</span> <span class="o">=</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/'</span> <span class="o">.</span> <span class="nb">strtr</span><span class="p">(</span><span class="nv">$className</span><span class="p">,</span> <span class="s1">'\\'</span><span class="p">,</span> <span class="nx">DIRECTORY_SEPARATOR</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'.php'</span><span class="p">;</span>      
         <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$fileName</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">include</span> <span class="nv">$fileName</span><span class="p">;</span>
 
@@ -161,11 +161,14 @@ brew install protobuf
     <span class="p">}</span>
 <span class="p">});</span>
 
+<span class="c1"># https://github.com/Cloudbet/schema/tree/master/php/helpers
+</span><span class="k">require_once</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">'/helpers/TableRenderer.php'</span><span class="p">;</span>
+
 </code></pre>
 
 <p>Our Protobuf schema can be found on <a href="https://github.com/Cloudbet/schema">Github</a></p>
 
-<p>Check one of the sample scripts to <code class="prettyprint">gen-*.sh</code> in order to generate accessors for your required language as below/</p>
+<p>Check one of the sample scripts to <code class="prettyprint">gen-*.sh</code> in order to generate accessors for your required language as below.</p>
 
 <h4 id="ruby">Ruby:</h4>
 
@@ -193,6 +196,12 @@ easy_install -d ~/python protobuf
 
 <aside>
 ./gen-php.sh /path/to/php-protobuf/protoc-gen-php.php
+</aside>
+
+<p>This will create the PHP proto files in the php directory. You can then run example.php in the root directory to see most of the API requests in action.</p>
+
+<aside>
+php example.php
 </aside>
 
 <p>n.b. This was tested using <a href="https://github.com/phpbrew/phpbrew">phpbrew</a> and PHP version 5.6.18 (7+ is not supported yet).</p>
@@ -348,7 +357,7 @@ You must replace <code>TOKEN</code> with your personal API key.
 <span class="p">}</span>
 <span class="k">foreach</span> <span class="p">(</span><span class="nv">$eventTree</span><span class="o">-&gt;</span><span class="na">getSports</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$sport</span><span class="p">)</span> <span class="p">{</span>
     <span class="nv">$competitionsCount</span> <span class="o">=</span> <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getCompetitionsCount</span><span class="p">();</span>
-    <span class="k">echo</span> <span class="p">(</span><span class="nv">$competitionsCount</span> <span class="o">?</span> <span class="s1">'+'</span> <span class="o">:</span> <span class="s1">'-'</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'- Sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="p">(</span><span class="nv">$competitionsCount</span> <span class="o">?</span> <span class="s1">'+'</span> <span class="o">:</span> <span class="s1">'-'</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'- Sport '</span> <span class="o">.</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportNames</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">:</span> <span class="s1">'#'</span> <span class="o">.</span> <span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">())</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
     <span class="k">foreach</span> <span class="p">(</span><span class="nv">$sport</span><span class="o">-&gt;</span><span class="na">getCompetitions</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$i</span> <span class="o">=&gt;</span> <span class="nv">$competition</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">echo</span> <span class="s1">'+-'</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getGroupsCount</span><span class="p">()</span> <span class="o">?</span> <span class="s1">'+'</span> <span class="o">:</span> <span class="s1">'-'</span><span class="p">)</span> <span class="o">.</span> <span class="s1">'- Competition "'</span> <span class="o">.</span> <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
         <span class="k">foreach</span> <span class="p">(</span><span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">getGroups</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$group</span><span class="p">)</span> <span class="p">{</span>
@@ -374,6 +383,10 @@ You must replace <code>TOKEN</code> with your personal API key.
 //  * since - competition will only contain events with start date greater or equal to provided value (UNIX timestamp)
 </span>
 <span class="nv">$competition</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\CompetitionTree</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$competitionId</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$competitionId</span> <span class="o">=</span> <span class="mi">196</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$competition</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'competition/'</span> <span class="o">.</span> <span class="nv">$competitionId</span><span class="p">));</span>
@@ -481,6 +494,10 @@ You must replace <code>TOKEN</code> with your personal API key.
 </span>
 <span class="nv">$event</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\Event</span><span class="p">();</span>
 
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$eventId</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$eventId</span> <span class="o">=</span> <span class="mi">398437</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'event/'</span> <span class="o">.</span> <span class="nv">$eventId</span><span class="p">));</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
@@ -512,6 +529,10 @@ You must replace <code>TOKEN</code> with your personal API key.
 </span>
 <span class="nv">$asianEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
 
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportId</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$asianEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'asian_events/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
@@ -519,9 +540,9 @@ You must replace <code>TOKEN</code> with your personal API key.
 <span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$asianEvents</span><span class="o">-&gt;</span><span class="na">getEventsCount</span><span class="p">())</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">'No asian events were found for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">'No asian events were found for sport '</span> <span class="o">.</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportNames</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">:</span> <span class="s1">'#'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">)</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">'Asian events for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">'Asian events for sport '</span> <span class="o">.</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportNames</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">:</span> <span class="s1">'#'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">)</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
     <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
         <span class="s1">'ID'</span><span class="p">,</span>
         <span class="s1">'Name'</span><span class="p">,</span>
@@ -564,6 +585,10 @@ You must replace <code>TOKEN</code> with your personal API key.
 </span>
 <span class="nv">$upcomingEvents</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\EventList</span><span class="p">();</span>
 
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportId</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$sportId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'upcoming/'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">));</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
@@ -571,9 +596,9 @@ You must replace <code>TOKEN</code> with your personal API key.
 <span class="p">}</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upcomingEvents</span><span class="o">-&gt;</span><span class="na">getEventsCount</span><span class="p">())</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">'No upcoming events were found for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">'No upcoming events were found for sport '</span> <span class="o">.</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportNames</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">:</span> <span class="s1">'#'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">)</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">'Upcoming events for sport "'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">'Upcoming events for sport '</span> <span class="o">.</span> <span class="p">((</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$sportNames</span><span class="p">)</span> <span class="o">?</span> <span class="s1">'"'</span> <span class="o">.</span> <span class="nv">$sportNames</span><span class="p">[</span><span class="nv">$sportId</span><span class="p">]</span> <span class="o">.</span> <span class="s1">'"'</span> <span class="o">:</span> <span class="s1">'#'</span> <span class="o">.</span> <span class="nv">$sportId</span><span class="p">))</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
     <span class="nv">$renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableRenderer</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
         <span class="s1">'ID'</span><span class="p">,</span>
         <span class="s1">'Name'</span><span class="p">,</span>
@@ -604,6 +629,10 @@ You must replace <code>TOKEN</code> with your personal API key.
 // Endpoint: /api/v1/sports/outright/&lt;outrightId&gt;
 </span>
 <span class="nv">$outright</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Sportsbook\Outright</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$outrightId</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$outrightId</span> <span class="o">=</span> <span class="mi">188134</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="k">try</span> <span class="p">{</span>
     <span class="nv">$outright</span><span class="o">-&gt;</span><span class="na">parseFromString</span><span class="p">(</span><span class="nx">getApiResponse</span><span class="p">(</span><span class="s1">'outright/'</span> <span class="o">.</span> <span class="nv">$outrightId</span><span class="p">));</span>
