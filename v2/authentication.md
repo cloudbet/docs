@@ -38,20 +38,30 @@ $ curl -H "Authorization: Bearer REFRESH_JWT" -H "Accept: application/json" -X P
 
 ```go
 package main
+
 import (
 	"fmt"
-	"github.com/parnurzeal/gorequest"
+	"io/ioutil"
+	"net/http"
 )
+
 func main() {
 	refreshToken := "<REFRESH_JWT>"
-	res, body, err := gorequest.New().
-		Post("https://sports-api.cloudbet.com/pub/v2/players/access-token").
-		Set("Authorization", fmt.Sprintf("Bearer %v", refreshToken)).
-		Set("Accept", "application/json").
-		SetDebug(true).
-		End()
-	fmt.Println(res, body, err)
+	req, err := http.NewRequest("POST", "https://sports-api.cloudbet.com/pub/v2/players/access-token", nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", refreshToken))
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	fmt.Println("Response Body:", string(body), err)
 }
+
 ```
 
 ##### Example in `python`
