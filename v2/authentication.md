@@ -34,6 +34,30 @@ The Cloudbet Odds API v2 uses Access JSON Web Tokens or [JWTs](https://jwt.io/) 
 $ curl -H "Authorization: Bearer REFRESH_JWT" -H "Accept: application/json" -X POST https://sports-api.cloudbet.com/pub/v2/players/access-token
 ```
 
+##### Example in `PHP`
+
+```php
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, 'https://sports-api.cloudbet.com/pub/v2/players/access-token');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_POST, 1);
+
+$headers = array();
+$headers[] = 'Authorization: Bearer <REFRESH_JWT>';
+$headers[] = 'Accept: application/json';
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$result = curl_exec($ch);
+if (curl_errno($ch)) {
+    echo 'Error:' . curl_error($ch);
+}
+curl_close($ch);
+
+echo "<ACCESS_JWT>: $result";
+
+```
+
 ##### Example in `golang`
 
 ```go
@@ -59,7 +83,7 @@ func main() {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	fmt.Println("Response Body:", string(body), err)
+	fmt.Println("<ACCESS_JWT>:", string(body), err)
 }
 
 ```
@@ -80,7 +104,7 @@ def get_access_token(refresh_token):
 
 refresh_token = "<REFRESH_JWT>"
 access_token = get_access_token(refresh_token)
-print(access_token)
+print('<ACCESS_JWT>: ' + access_token)
 ```
 
 ##### Example in `javascript`
@@ -94,7 +118,7 @@ async function getAccessToken(refreshToken) {
     `https://sports-api.cloudbet.com/pub/v2/players/access-token`,
     {
       method: "POST",
-      headers: { Authorization: `Bearer ${refreshToken}` }
+      headers: { Authorization: `Bearer ${refreshToken}` },
     }
   );
   let response = await request;
@@ -111,7 +135,7 @@ async function getAccessToken(refreshToken) {
 (async () => {
   let refreshToken = "<REFRESH_JWT>";
   let accessToken = await getAccessToken(refreshToken);
-  console.log(accessToken);
+  console.log("<ACCESS_JWT>: " + accessToken);
 })();
 ```
 
