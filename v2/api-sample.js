@@ -1,4 +1,4 @@
-// Sample script to trigger Cloudbet Odds API
+// Sample script to trigger Cloudbet Feed API
 // Can be run using node with the command: `node api-sample.js`
 "use strict";
 const _ = require("lodash");
