@@ -1,4 +1,4 @@
-Cloudbet API is publicly available, with documentation available at the [Cloudbet API Docs website](https://docs.cloudbet.com/) and provides you with Feed, Trading and Account APIs. This allows you to both access Cloudbet feeds and bet on odds offered by Cloudbet.
+[Cloudbet](https://www.cloudbet.com/) API is publicly available, with documentation available at the [Cloudbet API Docs website](https://docs.cloudbet.com/) and provides you with Feed, Trading and Account APIs. This allows you to both access Cloudbet feeds and bet on odds offered by Cloudbet.
 
 ## Cloudbet API Docs
 
