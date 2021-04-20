@@ -21,4 +21,4 @@ Cloudbet API Schemas are available as a [Github gist](https://gist.github.com/kg
 
 ## Issues/Questions
 
-Please feel free to create a Github Issue in this repository if you have any questions about or issues with the Cloudbet API.
+Start a new discussion in the [Cloudbet API discussions community](https://github.com/Cloudbet/docs/discussions) about any questions you may have. Someone from the community or from Cloudbet will help you out soon.
