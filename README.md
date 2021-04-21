@@ -15,9 +15,9 @@ In addition, you can obtain code and response samples for the Cloudbet API withi
 * [Code Samples](https://github.com/Cloudbet/docs/blob/master/api-sample.js)
 * [Response Samples](https://github.com/Cloudbet/docs/blob/master/api-responses.md)
 
-## Cloudbet API Schemas
+## Markets, Sports and Categories List
 
-Cloudbet API Schemas are available as a [Github gist](https://gist.github.com/kgravenreuth/6703e1e213aecac4d5728f2f699d34e7)
+For a full list of markets, sports and categories, please see this [Github gist](https://gist.github.com/kgravenreuth/6703e1e213aecac4d5728f2f699d34e7)
 
 ## Issues/Questions
 
