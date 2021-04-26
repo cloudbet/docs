@@ -231,24 +231,6 @@ Sample response:
       "key": "c672-miami-heat-v-c655-los-angeles-lakers",
       "cutoffTime": "2021-04-08T23:30:00Z",
       "metadata": {
-        "score": [
-          53,
-          55
-        ],
-        "setScores": [
-          {
-            "score": [
-              24,
-              41
-            ]
-          },
-          {
-            "score": [
-              29,
-              14
-            ]
-          }
-        ],
         "opinion": []
       },
       "startTime": "2021-04-08T23:30:00Z"
@@ -273,24 +255,6 @@ Sample response:
       "key": "nba-awards-coach-of-the-year-reg-season",
       "cutoffTime": "2021-04-08T23:30:00Z",
       "metadata": {
-        "score": [
-          53,
-          55
-        ],
-        "setScores": [
-          {
-            "score": [
-              24,
-              41
-            ]
-          },
-          {
-            "score": [
-              29,
-              14
-            ]
-          }
-        ],
         "opinion": []
       },
       "startTime": "2021-04-08T23:30:00Z"
@@ -500,8 +464,6 @@ Get event with markets for given event ID.
   "key": "c672-miami-heat-v-c655-los-angeles-lakers",
   "cutoffTime": "2021-04-08T23:30:00Z",
   "metadata": {
-    "score": [],
-    "setScores": [],
     "opinion": []
   },
   "startTime": "2021-04-08T23:30:00Z"
