@@ -8,6 +8,22 @@ These are the Cloudbet API Docs available currently:
 * [Cloudbet Trading API Docs](https://docs.cloudbet.com/?urls.primaryName=Trading)
 * [Cloudbet Account API Docs](https://docs.cloudbet.com/?urls.primaryName=Account)
 
+
+## Cloudbet API Protobuf Schemas
+
+The Cloudbet API consists of Feed, Trading and Account API. The Feed API provides market odds, the Trading API allows you to bet on these markets and the Account API allows you to query your account details such as currencies and balances.
+
+This repository contains protocol buffer v3 (protobuf) definitions and generated `Go` protobuf files which can be used as reference when integrating the Cloudbet API.
+
+Note that our API uses the `Go` [`protojson`](https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson) library for marshaling and unmarshaling of protobuf messages as JSON format in API requests and responses.
+
+### Organization
+
+There are two sub-directories called `cloudbet` and `go/cloudbet`. These sub-directories have Feed, Trading and Account API protobuf and generated Go files. The `response` protobuf is used by all the API endpoints to render responses, including response status and error responses.
+
+1. `cloudbet` contains the protobuf files for `account`, `feed`, `trading` and `response` API.
+2. `go/cloudbet` contains the go protobuf files generated from the protobuf files above.
+
 ## Cloudbet API Samples
 
 In addition, you can obtain code and response samples for the Cloudbet API within this repository:
