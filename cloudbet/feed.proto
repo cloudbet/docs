@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package cloudbet;
+option go_package = "cloudbet";
+import "cloudbet/trading.proto";
+
+// Sports is used as the root object in the /sports endpoint
+//
+// swagger:model
+message Sports {
+    // list of all sports offerred
+    repeated Sport sports = 1;
+}
+
+// Sport is used for an individual sport's details in the /sports endpoint
+//
+// swagger:model
+message Sport {
+    // name of this Sport
+    string name = 1;
+    // slug for this Sport
+    string key = 2;
+    // number of competitions associated with this Sport, 0 indicates inactive Sport
+    uint32 competition_count = 4;
+    // number of events associated with this Sport, 0 indicates inactive Sport
+    uint32 event_count = 7;
+}
+
+// SportWithCategory is used for the /sports/{key} endpoint
+// with this hierarchy: sport->categories->competitions
+//
+// swagger:model
+message SportWithCategory {
+    // name of this Sport
+    string name = 1;
+    // slug for this Sport
+    string key = 2;
+    // number of competitions associated with this Sport, 0 indicates inactive Sport
+    uint32 competition_count = 4;
+    // list of all categories associated with this Sport
+    repeated Category categories = 5;
+    // number of events associated with this Sport, 0 indicates inactive Sport
+    uint32 event_count = 7;
+}
+
+// Category is used for the /sports/{key} endpoint
+//
+// swagger:model
+message Category {
+    // name of this Category
+    string name = 1;
+    // slug for this Category
+    string key = 2;
+    // list of all competitions associated with this Category
+    repeated CompetitionForSport competitions = 3;
+}
+
+// CompetitionForSport is used for the /sports/{key} endpoint
+//
+// swagger:model
+message CompetitionForSport {
+    // name of this Competition
+    string name = 2;
+    // slug for this Competition
+    string key = 3;
+    // number of events associated with this Competition, 0 events indicates inactive Competition
+    uint32 event_count = 11;
+}
+
+// Competition is used for the /sports/competitions/{key} endpoint
+//
+// swagger:model
+message Competition {
+    // name of this Competition
+    string name = 2;
+    // slug for this Competition
+    string key = 3;
+    // sport associated with this Competition
+    Identifier sport = 4;
+    // list of all events associated with this competition
+    repeated EventForCompetition events = 8;
+    // category associated with this Competition
+    Identifier category = 10;
+}
+
+// CompetitionWithCategory is used for the /sports/events/{id} endpoint to link events with competitions
+//
+// swagger:model
+message CompetitionWithCategory {
+    // name of this Competition
+    string name = 2;
+    // slug for this Competition
+    string key = 3;
+    // category associated with this Competition
+    Identifier category = 10;
+}
+
+// EventForCompetition is used for the /sports/competitions/{key} endpoint
+//
+// swagger:model
+message EventForCompetition {
+    // sequential update number for this Event
+    int64 sequence = 1;
+    // unique ID for this Event
+    uint32 id = 2;
+    // key-name tuple for the home team competitor of this Event
+    TeamIdentifier home = 7;
+    // key-name tuple for the away team competitor of this Event
+    TeamIdentifier away = 8;
+    // current status of this Event
+    EventStatus status = 10;
+    // mapping between market key and all associated markets for this Event
+    map<string, Market> markets = 13;
+    // name of this Event
+    string name = 18;
+    // slug for this Event
+    string key = 19;
+
+    // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    string cutoff_time = 23;
+
+    // metadata
+    EventMetadata metadata = 17;
+}
+
+// Event is used for the /sports/events/{id} endpoint
+//
+// swagger:model
+message Event {
+    // sequential update number for this Event
+    int64 sequence = 1;
+    // unique ID for this Event
+    uint32 id = 2;
+    // sport associated with this Event
+    Identifier sport = 5;
+    // competition associated with this Event
+    CompetitionWithCategory competition = 6;
+    // key-name tuple for the home team competitor of this Event
+    TeamIdentifier home = 7;
+    // key-name tuple for the away team competitor of this Event
+    TeamIdentifier away = 8;
+    // current status of this Event
+    EventStatus status = 10;
+    // mapping between market key and all associated markets for this Event
+    map<string, Market> markets = 13;
+    // name of this Event
+    string name = 18;
+    // slug for this Event
+    string key = 19;
+
+    // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    string cutoff_time = 23;
+
+    // metadata
+    EventMetadata metadata = 17;
+}
+
+// Event metadata contains additional event info
+//
+// swagger:model
+message EventMetadata {
+    // opinion is an answer to question "how players bet"
+    repeated OutcomeProbability opinion = 47;
+}
+
+// Similar to Selection, but represents opinion (probability) for particular outcome of the market
+//
+// swagger:model
+message OutcomeProbability {
+    // outcome
+    string outcome = 1;
+    // probability
+    float probability = 2;
+    // market key used to build opinion
+    string market_key = 3;
+    // market parameters used to build opinion, such as handicap, period etc.
+    string params = 4;
+}
+
+// Market is used as a part of Event and EventForCompetition
+// used to build a list of all markets for a given Event
+//
+// swagger:model
+message Market {
+    // mapping between submarket key and all associated submarkets for this Market
+    map<string, Submarket> submarkets = 2;
+}
+
+// Submarket contains selections which are inter-dependent on each other and is used as a part of Market
+// used to build a map of all submarkets for a given Market
+//
+// swagger:model
+message Submarket {
+    // sequential update number for this Submarket
+    int64 sequence = 4;
+    // list of all associated selections for this Submarket
+    repeated Selection selections = 6;
+}
+
+// Selection is used as a part of Submarket
+// used to build a list of all selections for a given Submarket
+//
+// swagger:model
+message Selection {
+    // outcome of this Selection
+    string outcome = 1;
+    // parameters to be sent by the client during bet placement on this selection, such as handicap, period etc.
+    string params = 2;
+    // price at which bets can be placed on this Selection
+    double price = 3;
+    // maximum stake in EUR which can be placed in bets on this Selection; market liability = selection max stake * (price - 1); minimum stake is 0.01 EUR for all markets
+    double max_stake = 5;
+    // probability of this Selection's outcome
+    double probability = 6;
+    // current status of this Selection
+    SelectionStatus status = 7;
+    // side of this Selection (back/lay)
+    cloudbet.Side side = 8;
+}
+
+// Identifier represents a name-key tuple which together identify a given entity such as a sport
+//
+// swagger:model
+message Identifier {
+    // name of this Identifier
+    string name = 1;
+    // slug for this Identifier
+    string key = 2;
+}
+
+// TeamIdentifier identifies a team competitor for a given event
+//
+// swagger:model
+message TeamIdentifier {
+    // name of this Identifier
+    string name = 1;
+    // slug for this Identifier
+    string key = 2;
+    // abbreviation for this team's name
+    string abbreviation = 4;
+    // team country code
+    string nationality = 6;
+}
+
+/* Enum definitions start */
+
+// EventStatus presents the current status for a given Event
+enum EventStatus {
+    // event is not yet open for bet placement
+    PRE_TRADING = 0;
+    // event is open for bet placement and is not Live yet
+    TRADING = 1;
+    // event is open for bet placement and Live/In-play
+    TRADING_LIVE = 2;
+    // event has finished and bets are graded
+    RESULTED = 3;
+    // event was live, but has been interrupted. Event start time may possible change in the future.
+    INTERRUPTED = 4;
+    // event has finished and results are being awaited
+    AWAITING_RESULTS = 5;
+    // event was live, but has been suspended for trading temporarily
+    POST_TRADING = 6;
+    // event has been cancelled. All bets already placed on this event will be pushed
+    CANCELLED = 7;
+}
+
+// SelectionStatus presents the current status for a given selection
+enum SelectionStatus {
+    // selection unavailable for bet placement
+    SELECTION_DISABLED = 0;
+    // selection available for bet placement
+    SELECTION_ENABLED = 1;
+}
+
+// Team presents the team for a given player
+enum Team {
+    // no team defined for a given player
+    TEAM_UNDEFINED = 0;
+    // given player belongs to the home team
+    HOME = 1;
+    // given player belongs to the away team
+    AWAY = 2;
+}
+
+/* Enum definitions end */

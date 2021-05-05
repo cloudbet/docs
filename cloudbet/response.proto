@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package cloudbet;
+option go_package = "cloudbet";
+
+// swagger:model
+message Error {
+    // Error Status
+    // example: MALFORMED_REQUEST
+    Status status = 9;
+    // Additional Error Details, if applicable for a given error
+    // example: empty request body
+    string error = 17;
+}
+
+enum Status {
+    // unexpected error at server side. Our engineering team is informed of the issue, please try again
+    INTERNAL_SERVER_ERROR = 0;
+    // duplicated request with same Reference ID was posted, this is due to idempotent request handling. If you want to resubmit this bet, please add a new Reference ID
+    DUPLICATE_REQUEST = 1;
+    // the request was not sent as per the expected request structure
+    MALFORMED_REQUEST = 2;
+    // bet price requested was above the current market price
+    PRICE_ABOVE_MARKET = 3;
+    // account doesn't have sufficient funds in the requested currency
+    INSUFFICIENT_FUNDS = 29;
+    // stake requested was above the current maximum stake on a selection
+    STAKE_ABOVE_MAX = 5;
+    // stake requested was below the current minimum stake on a selection
+    STAKE_BELOW_MIN = 6;
+    // your current liability limit on this event was exceeded, please try again later as limits are raised towards start time and during live betting
+    LIABILITY_LIMIT_EXCEEDED = 7;
+    // you attempted to bet on an inactive selection
+    MARKET_SUSPENDED = 8;
+    // your bet was accepted successfully
+    ACCEPTED = 9;
+    // your bet is being processed by the system. Please check the bet status again periodically to get bet status updates
+    PENDING_ACCEPTANCE = 10;
+    // your current account settings don't allow you to bet on this event. Restrictions will be lifted automatically as your account attains tenure and trust. Please contact customer support if you believe you qualify and we will review your account.
+    RESTRICTED = 12;
+    // your account needs to be verified using our KYC procedures. Please contact customer support for more details.
+    VERIFICATION_REQUIRED = 27;
+
+    // you won the bet
+    WIN = 20;
+    // you lost the bet
+    LOSS = 21;
+    // market not applicable to result, e.g. draw on 2way, handicap
+    PUSH = 22;
+    // half win, e.g. on a handicap market
+    HALF_WIN = 23;
+    // half loss, e.g. on a handicap market
+    HALF_LOSS = 24;
+    // partial win, including dead heat result
+    PARTIAL = 25;
+}
