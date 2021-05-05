@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package cloudbet;
+option go_package = "cloudbet";
+
+// swagger:model account_info
+message Info {
+    // example: e66a49bb-bdde-42e5-804f-878f82b0b824
+    string uuid = 1;
+    // example: username@example.org
+    string email = 2;
+    // example: username
+    string nickname = 3;
+}
+
+// swagger:model account_balance
+message Balance {
+    // the account balance
+    // example: 0.12345678
+    string amount = 1;
+}
+
+// swagger:model account_currencies
+message Currencies {
+    // the list of active account currencies
+    // example: ["BTC", "ETH", "PLAY_EUR"]
+    repeated string currencies = 1;
+}
