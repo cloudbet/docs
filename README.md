@@ -35,6 +35,12 @@ In addition, you can obtain code and response samples for the Cloudbet API withi
 
 For a full list of markets, sports and categories, please see this [Github gist](https://gist.github.com/kgravenreuth/6703e1e213aecac4d5728f2f699d34e7)
 
+## Event Status
+
+Events on Cloudbet can have different status depending on whether the event has markets offered, is live, has ended etc. This status is reflected in the `Event.status` field in our Feed API. Here is a summary of the different event statuses and their details.
+
+![Cloudbet API Event Status](./event_status.svg)
+
 ## Issues/Questions
 
 Start a new discussion in the [Cloudbet API discussions community](https://github.com/Cloudbet/docs/discussions) about any questions you may have. Someone from the community or from Cloudbet will help you out soon.
