@@ -6,7 +6,7 @@ import "cloudbet/trading.proto";
 
 // Sports is used as the root object in the /sports endpoint
 //
-// swagger:model
+// swagger:model Sports
 message Sports {
     // list of all sports offerred
     repeated Sport sports = 1;
@@ -14,42 +14,71 @@ message Sports {
 
 // Sport is used for an individual sport's details in the /sports endpoint
 //
-// swagger:model
+// swagger:model Sport
 message Sport {
     // name of this Sport
+    //
+    // example: Tennis
     string name = 1;
     // slug for this Sport
+    //
+    // example: tennis
     string key = 2;
     // number of competitions associated with this Sport, 0 indicates inactive Sport
+    //
+    // example: 2
     uint32 competition_count = 4;
     // number of events associated with this Sport, 0 indicates inactive Sport
+    //
+    // example: 4
     uint32 event_count = 7;
 }
 
 // SportWithCategory is used for the /sports/{key} endpoint
 // with this hierarchy: sport->categories->competitions
 //
-// swagger:model
+// swagger:model SportWithCategory
 message SportWithCategory {
     // name of this Sport
+    //
+    // example: Tennis
     string name = 1;
     // slug for this Sport
+    //
+    // example: tennis
     string key = 2;
     // number of competitions associated with this Sport, 0 indicates inactive Sport
+    //
+    // example: 2
     uint32 competition_count = 4;
     // list of all categories associated with this Sport
     repeated Category categories = 5;
     // number of events associated with this Sport, 0 indicates inactive Sport
+    //
+    // example: 4
     uint32 event_count = 7;
+}
+
+// FixturesCompetitions is used for the /fixtures endpoint
+// It gives a list of all competitions and events for the requested Sport
+//
+// swagger:model FixturesCompetitions
+message FixturesCompetitions {
+    // list of all requested competitions and events
+    repeated FixturesCompetition competitions = 1;
 }
 
 // Category is used for the /sports/{key} endpoint
 //
-// swagger:model
+// swagger:model Category
 message Category {
     // name of this Category
+    //
+    // example: "ATP"
     string name = 1;
     // slug for this Category
+    //
+    // example: "atp"
     string key = 2;
     // list of all competitions associated with this Category
     repeated CompetitionForSport competitions = 3;
@@ -57,130 +86,274 @@ message Category {
 
 // CompetitionForSport is used for the /sports/{key} endpoint
 //
-// swagger:model
+// swagger:model CompetitionForSport
 message CompetitionForSport {
     // name of this Competition
+    //
+    // example: "French Open, Men Singles"
     string name = 2;
-    // slug for this Competition
+    // slug for this Competition. Composed of <sport-key>-<category-key>-<competition-key> as shown in the example value.
+    //
+    // example: "tennis-atp-french-open-men-singles"
     string key = 3;
     // number of events associated with this Competition, 0 events indicates inactive Competition
+    //
+    // example: 2
     uint32 event_count = 11;
 }
 
 // Competition is used for the /sports/competitions/{key} endpoint
 //
-// swagger:model
+// swagger:model Competition
 message Competition {
     // name of this Competition
+    //
+    // example: "French Open, Men Singles"
     string name = 2;
-    // slug for this Competition
+    // slug for this Competition. Composed of <sport-key>-<category-key>-<competition-key> as shown in the example value.
+    //
+    // example: "tennis-atp-french-open-men-singles"
     string key = 3;
     // sport associated with this Competition
+    //
+    // example: {"name":"Tennis","key":"tennis"}
     Identifier sport = 4;
     // list of all events associated with this competition
     repeated EventForCompetition events = 8;
     // category associated with this Competition
+    //
+    // example: {"name":"ATP","key":"atp"}
     Identifier category = 10;
 }
 
 // CompetitionWithCategory is used for the /sports/events/{id} endpoint to link events with competitions
 //
-// swagger:model
+// swagger:model CompetitionWithCategory
 message CompetitionWithCategory {
     // name of this Competition
+    //
+    // example: "French Open, Men Singles"
     string name = 2;
-    // slug for this Competition
+    // slug for this Competition. Composed of <sport-key>-<category-key>-<competition-key> as shown in the example value.
+    //
+    // example: "tennis-atp-french-open-men-singles"
     string key = 3;
     // category associated with this Competition
+    //
+    // example: {"name":"ATP","key":"atp"}
+    Identifier category = 10;
+}
+
+// FixturesCompetition is used for the /fixtures endpoint
+// It gives a list of all events for a given competition
+//
+// swagger:model FixturesCompetition
+message FixturesCompetition {
+    // name of this Competition
+    //
+    // example: "French Open, Men Singles"
+    string name = 2;
+    // slug for this Competition. Composed of <sport-key>-<category-key>-<competition-key> as shown in the example value.
+    //
+    // example: "tennis-atp-french-open-men-singles"
+    string key = 3;
+    // sport associated with this Competition
+    //
+    // example: {"name":"Tennis","key":"tennis"}
+    Identifier sport = 4;
+    // list of events which belong to this competition
+    repeated FixtureListEntry events = 8;
+    // category associated with all events in this list
+    //
+    // example: {"name":"ATP","key":"atp"}
     Identifier category = 10;
 }
 
 // EventForCompetition is used for the /sports/competitions/{key} endpoint
 //
-// swagger:model
+// swagger:model EventForCompetition
 message EventForCompetition {
     // sequential update number for this Event
+    //
+    // example: 127
     int64 sequence = 1;
     // unique ID for this Event
+    //
+    // example: 7498746
     uint32 id = 2;
-    // key-name tuple for the home team competitor of this Event
+    // details for the home team competitor of this Event
     TeamIdentifier home = 7;
-    // key-name tuple for the away team competitor of this Event
+    // details for the away team competitor of this Event
     TeamIdentifier away = 8;
-    // current status of this Event
+    // current status of this Event. Possible Event Status states and their meanings are explained [here](https://github.com/Cloudbet/docs/blob/3bbbcf9bf19426d74702e95292e47a147f9a503a/README.md#event-status)
+    //
+    // example: "TRADING"
     EventStatus status = 10;
     // mapping between market key and all associated markets for this Event
     map<string, Market> markets = 13;
     // name of this Event
+    //
+    // example: "Rafael Nadal V Diego Schwartzman"
     string name = 18;
     // slug for this Event
+    //
+    // example: "c886a-nadal-rafael-v-c8973-schwartzman-diego"
     string key = 19;
 
     // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    //
+    // example: "2021-06-09T09:00:00Z"
     string cutoff_time = 23;
 
-    // metadata
+    // metadata about this event, such as Cloudbet opinion on the winner
     EventMetadata metadata = 17;
+
+    // event type for this event
+    //
+    // example: "EVENT_TYPE_EVENT"
+    EventType type = 24;
+}
+
+// FixtureListEntry is used for the /fixtures endpoint
+// It gives an individual sporting event without markets or metadata information
+//
+// swagger:model FixtureListEntry
+message FixtureListEntry {
+    // unique ID for this Event
+    //
+    // example: 7498746
+    uint32 id = 2;
+    // details for the home team competitor of this Event
+    TeamIdentifier home = 7;
+    // details for the away team competitor of this Event
+    TeamIdentifier away = 8;
+    // current status of this Event. Possible Event Status states and their meanings are explained [here](https://github.com/Cloudbet/docs/blob/3bbbcf9bf19426d74702e95292e47a147f9a503a/README.md#event-status)
+    //
+    // example: "TRADING"
+    EventStatus status = 10;
+    // name of this Event
+    //
+    // example: "Rafael Nadal V Diego Schwartzman"
+    string name = 18;
+    // slug for this Event
+    //
+    // example: "c886a-nadal-rafael-v-c8973-schwartzman-diego"
+    string key = 19;
+
+    // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    //
+    // example: "2021-06-09T09:00:00Z"
+    string cutoff_time = 23;
+
+    // event type for this event
+    //
+    // example: "EVENT_TYPE_EVENT"
+    EventType type = 24;
 }
 
 // Event is used for the /sports/events/{id} endpoint
 //
-// swagger:model
+// swagger:model Event
 message Event {
     // sequential update number for this Event
+    //
+    // example: 127
     int64 sequence = 1;
     // unique ID for this Event
+    //
+    // example: 7498746
     uint32 id = 2;
-    // sport associated with this Event
+    // sport associated with this Competition
+    //
+    // example: {"name":"Tennis","key":"tennis"}
     Identifier sport = 5;
-    // competition associated with this Event
+    // details of the competition associated with this Event
     CompetitionWithCategory competition = 6;
-    // key-name tuple for the home team competitor of this Event
+    // details for the home team competitor of this Event
     TeamIdentifier home = 7;
-    // key-name tuple for the away team competitor of this Event
+    // details for the away team competitor of this Event
     TeamIdentifier away = 8;
-    // current status of this Event
+    // current status of this Event. Possible Event Status states and their meanings are explained [here](https://github.com/Cloudbet/docs/blob/3bbbcf9bf19426d74702e95292e47a147f9a503a/README.md#event-status)
+    //
+    // example: "TRADING"
     EventStatus status = 10;
     // mapping between market key and all associated markets for this Event
     map<string, Market> markets = 13;
     // name of this Event
+    //
+    // example: "Rafael Nadal V Diego Schwartzman"
     string name = 18;
     // slug for this Event
+    //
+    // example: "c886a-nadal-rafael-v-c8973-schwartzman-diego"
     string key = 19;
 
     // event cutoff time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    //
+    // example: "2021-06-09T09:00:00Z"
     string cutoff_time = 23;
 
-    // metadata
+    // metadata about this event, such as Cloudbet opinion on the winner
     EventMetadata metadata = 17;
+
+    // event type for this event
+    //
+    // example: "EVENT_TYPE_EVENT"
+    EventType type = 24;
+
+    // reserved field for possible future use, empty currently
+    //
+    // The map key will be the score types, such as period=default
+    map<string, Scores> settlement = 33;
 }
 
 // Event metadata contains additional event info
 //
-// swagger:model
+// swagger:model EventMetadata
 message EventMetadata {
-    // opinion is an answer to question "how players bet"
+    // opinions represent the betting patterns of players on different outcomes of different markets
+    map<string, Opinion> opinions = 73;
+
+    // Deprecated fields below
+    // (deprecated, use opinions instead) opinion is an answer to the question "How do players bet on Cloudbet v/s the currently offered odds?"
     repeated OutcomeProbability opinion = 47;
 }
 
 // Similar to Selection, but represents opinion (probability) for particular outcome of the market
 //
-// swagger:model
+// swagger:model OutcomeProbability
 message OutcomeProbability {
     // outcome
+    //
+    // example: "home"
     string outcome = 1;
     // probability
+    //
+    // example: 0.47347018
     float probability = 2;
     // market key used to build opinion
+    //
+    // example: "basketball.handicap"
     string market_key = 3;
     // market parameters used to build opinion, such as handicap, period etc.
+    //
+    // example: "handicap=-3"
     string params = 4;
+}
+
+// Opinion represents the opinions for all outcomes of a given market
+//
+// swagger:model Opinion
+message Opinion {
+    // list of outcome probabilities
+    repeated OutcomeProbability outcomes = 1;
 }
 
 // Market is used as a part of Event and EventForCompetition
 // used to build a list of all markets for a given Event
 //
-// swagger:model
+// swagger:model Market
 message Market {
     // mapping between submarket key and all associated submarkets for this Market
     map<string, Submarket> submarkets = 2;
@@ -189,57 +362,129 @@ message Market {
 // Submarket contains selections which are inter-dependent on each other and is used as a part of Market
 // used to build a map of all submarkets for a given Market
 //
-// swagger:model
+// swagger:model Submarket
 message Submarket {
-    // sequential update number for this Submarket
+    // sequential update number
     int64 sequence = 4;
-    // list of all associated selections for this Submarket
+    // list of all associated selections
     repeated Selection selections = 6;
 }
 
 // Selection is used as a part of Submarket
 // used to build a list of all selections for a given Submarket
 //
-// swagger:model
+// swagger:model Selection
 message Selection {
     // outcome of this Selection
+    //
+    // example: "home"
     string outcome = 1;
     // parameters to be sent by the client during bet placement on this selection, such as handicap, period etc.
+    // Special Note about handicap markets:
+    // For handicap markets a line is identified by the same params. Selections can be grouped by market key and params alone. Home and away outcomes then have the same market URL for the same handicap lines. The handicap value is dictated by the home team value and inverted on the away side.
+    //
+    // example: "handicap=-3"
     string params = 2;
     // price at which bets can be placed on this Selection
+    //
+    // example: 1.892
     double price = 3;
-    // maximum stake in EUR which can be placed in bets on this Selection; market liability = selection max stake * (price - 1); minimum stake is 0.01 EUR for all markets
+    // minimum stake in EUR which can be placed in bets on this Selection
+    //
+    // example: 0.1
+    double min_stake = 4;
+    // maximum stake in EUR which can be placed in bets on this Selection; market liability = selection max stake * (price - 1);
+    //
+    // example: 1803.6394618802
     double max_stake = 5;
     // probability of this Selection's outcome
+    //
+    // example: 0.493
     double probability = 6;
-    // current status of this Selection
+    // current status of this Selection. Possible values: "SELECTION_ENABLED" or "SELECTION_DISABLED"
+    //
+    // example: "SELECTION_ENABLED"
     SelectionStatus status = 7;
-    // side of this Selection (back/lay)
+    // side of this Selection ("BACK" or "LAY"). Currently, only "BACK" is supported by the Cloudbet API
+    //
+    // example: "BACK"
     cloudbet.Side side = 8;
+}
+
+// Request body for Line fetch API
+//
+// in:body
+// required: true
+// swagger:model PostLine
+message LineRequest {
+    // Event ID for which the line fetch is requested
+    //
+    // required: true
+    // example: 6162894
+    string eventId = 1;
+
+    // `marketUrl` is composed from the initial Feed API selection response as `marketKey/outcome?params`.
+    // If no params (empty string) were present in the initial Feed API response, then omit the `params` query string format the `marketUrl` as `marketKey/outcome`
+    // Special Note about handicap markets:
+    // For handicap markets a line is identified by the same params. Selections can be grouped by market key and params alone. Home and away outcomes then have the same market URL for the same handicap lines. The handicap value is dictated by the home team value and inverted on the away side.
+    //
+    // required: true
+    // example: basketball.handicap/home?handicap=-3
+    string marketUrl = 2;
 }
 
 // Identifier represents a name-key tuple which together identify a given entity such as a sport
 //
-// swagger:model
+// swagger:model Identifier
 message Identifier {
     // name of this Identifier
+    //
+    // example: "Tennis"
     string name = 1;
     // slug for this Identifier
+    //
+    // example: "tennis"
     string key = 2;
 }
 
 // TeamIdentifier identifies a team competitor for a given event
 //
-// swagger:model
+// swagger:model TeamIdentifier
 message TeamIdentifier {
-    // name of this Identifier
+    // name of this TeamIdentifier
+    //
+    // example: "Rafael Nadal"
     string name = 1;
-    // slug for this Identifier
+    // slug for this TeamIdentifier
+    //
+    // example: "c886a-nadal-rafael"
     string key = 2;
     // abbreviation for this team's name
+    //
+    // example: "NAD"
     string abbreviation = 4;
     // team country code
+    //
+    // example: "ESP"
     string nationality = 6;
+    // UUID to fetch more information for a given competitor
+    //
+    // example: "66cdc662-f48b-4d55-960f-cb92ce3f3c5c"
+    string research_id = 7;
+}
+
+// Scores is a reserved field for possible future use with Settlement
+//
+// swagger:model Scores
+message Scores {
+    // layout for scores
+    //
+    // example: event: ['home', 'away']; outright: ['outcome=swansea']; racing: ['player=lucky-k-1', 'player=darwin-c-1', 'player=loca-m-1']
+    repeated string layout = 1;
+    // scores details
+    //
+    // example: event: [1, 2]; outright: [1]; racing: [1, 1, 2]
+    repeated uint32 scores = 2;
 }
 
 /* Enum definitions start */
@@ -280,6 +525,14 @@ enum Team {
     HOME = 1;
     // given player belongs to the away team
     AWAY = 2;
+}
+
+// EventType presents the type of an event which affects the markets format
+enum EventType {
+    EVENT_TYPE_EVENT                  = 0;
+    EVENT_TYPE_OUTRIGHT               = 1;
+    EVENT_TYPE_VIRTUAL                = 2;
+    EVENT_TYPE_MULTI_COMPETITOR_EVENT = 3;
 }
 
 /* Enum definitions end */

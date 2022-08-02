@@ -3,7 +3,8 @@ syntax = "proto3";
 package cloudbet;
 option go_package = "cloudbet";
 
-// swagger:model
+// Error presents response errors for all error status codes.
+// swagger:model Error
 message Error {
     // Error Status
     // example: MALFORMED_REQUEST

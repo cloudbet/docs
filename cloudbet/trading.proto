@@ -6,7 +6,7 @@ import "cloudbet/response.proto";
 
 // Public Bet Request
 //
-// swagger:model
+// swagger:model PublicBetRequest
 message PublicBetRequest {
     // Reference ID, randomly generated request id to allow idempotent calls. Required to be in the UUID format.
     //
@@ -16,16 +16,21 @@ message PublicBetRequest {
     // Stake in number
     //
     // required: true
+    // example: 1.1
     string stake = 2;
     // Price as number
     //
     // required: true
+    // example: 1.86
     string price = 3;
     // Event ID
     //
     // required: true
+    // example: 5945044
     string event_id = 4;
     // Market URL, is compiled from the feed data as `marketKey/outcome?params`, if no params (empty string) are present omit the query string and format as `marketKey/outcome`
+    // Special Note about handicap markets:
+    // For handicap markets a line is identified by the same params. Selections can be grouped by market key and params alone. Home and away outcomes then have the same market URL for the same handicap lines. The handicap value is dictated by the home team value and inverted on the away side.
     //
     // required: true
     // example: soccer.total_goals/over?total=3
@@ -37,29 +42,34 @@ message PublicBetRequest {
     // Currency for given stake
     //
     // required: true
+    // example: PLAY_EUR
     string currency = 7;
 
     // Accept better price, default to be no price change
     //
     // required: false
+    // example: BETTER
     AcceptPriceChange accept_price_change = 12;
 }
 
 // Public Bet Response
 //
-// swagger:model
+// swagger:model PublicBetResponse
 message PublicBetResponse {
     // Reference ID
     //
     // required: true
+    // example: 0e81877b-4b10-4587-a4cf-89f4336ac843
     string reference_id = 1;
     // Price as number
     //
     // required: true
+    // example: 1.86
     string price = 3;
     // Event ID
     //
     // required: true
+    // example: 5945044
     string event_id = 4;
     // Market URL
     //
@@ -73,10 +83,12 @@ message PublicBetResponse {
     // Currency for given stake
     //
     // required: true
+    // example: PLAY_EUR
     string currency = 7;
     // Stake in number
     //
     // required: true
+    // example: 1.1
     string stake = 8;
     // Bet status
     //
@@ -85,22 +97,27 @@ message PublicBetResponse {
     // Return Amount as number, pending bets will have 0
     //
     // required: true
+    // example: 0.0
     string return_amount = 12;
     // Event name in english
     //
     // required: true
+    // example: TSG Hoffenheim V Borussia Monchengladbach
     string event_name = 13;
     // Sports Key
     //
     // required: true
+    // example: soccer
     string sports_key = 14;
     // Competition ID
     //
     // required: true
+    // example: 32
     int64 competition_id = 15;
     // Category Key
     //
     // required: true
+    // example: germany
     string category_key = 16;
     // Error Details, indicates some descriptive reasoning on bet rejection, for `MALFORMED_REQUEST`
     //
@@ -109,7 +126,7 @@ message PublicBetResponse {
 }
 
 // Public Bet History Response
-// swagger:model
+// swagger:model PublicBetHistoryResponse
 message PublicBetHistoryResponse {
     // Bets
     //
@@ -118,6 +135,7 @@ message PublicBetHistoryResponse {
     // Total number of bets used for pagination
     //
     // required: true
+    // example: 654
     int64 total_bets = 2;
 }
 
