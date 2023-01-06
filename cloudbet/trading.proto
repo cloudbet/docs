@@ -90,6 +90,11 @@ message PublicBetResponse {
     // required: true
     // example: 1.1
     string stake = 8;
+    // Create time, time in string format "2006-01-02T15:04:05Z07:00" (RFC3339)
+    //
+    // required: true
+    // example: "2006-01-02T15:04:05Z07:00"
+    string create_time = 18;
     // Bet status
     //
     // required: true
@@ -119,6 +124,10 @@ message PublicBetResponse {
     // required: true
     // example: germany
     string category_key = 16;
+    // Customer Reference
+    //
+    // required: true
+    string customer_reference = 11;
     // Error Details, indicates some descriptive reasoning on bet rejection, for `MALFORMED_REQUEST`
     //
     // required: false

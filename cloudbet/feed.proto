@@ -144,7 +144,7 @@ message CompetitionWithCategory {
     Identifier category = 10;
 }
 
-// FixturesCompetition is used for the /fixtures endpoint
+// FixturesCompetition is used for the /fixtures and /events endpoints
 // It gives a list of all events for a given competition
 //
 // swagger:model FixturesCompetition
@@ -214,8 +214,9 @@ message EventForCompetition {
     EventType type = 24;
 }
 
-// FixtureListEntry is used for the /fixtures endpoint
-// It gives an individual sporting event without markets or metadata information
+// FixtureListEntry is used for the /fixtures and /events endpoints
+// It gives an individual sporting event without metadata information.
+// It has markets only on /events endpoint, no markets information on /fixtures endpoint
 //
 // swagger:model FixtureListEntry
 message FixtureListEntry {
@@ -231,6 +232,8 @@ message FixtureListEntry {
     //
     // example: "TRADING"
     EventStatus status = 10;
+    // mapping between market key and all associated markets for this Event. This is empty for /fixtures endpoint but populated for /events endpoint
+    map<string, Market> markets = 13;
     // name of this Event
     //
     // example: "Rafael Nadal V Diego Schwartzman"
