@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package cloudbet;
-option go_package = "schema/cloudbet";
+option go_package = "cloudbet";
 import "cloudbet/trading.proto";
 
 // Sports is used as the root object in the /sports endpoint

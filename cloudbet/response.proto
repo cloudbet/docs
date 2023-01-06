@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package cloudbet;
-option go_package = "schema/cloudbet";
+option go_package = "cloudbet";
 
 // Error presents response errors for all error status codes.
 // swagger:model Error
