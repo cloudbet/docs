@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package cloudbet;
-option go_package = "cloudbet";
+option go_package = "schema/cloudbet";
 
 // swagger:model account_info
 message Info {
